@@ -25,6 +25,7 @@
 using xcexecution::SimpleExecutor;
 using libutil::Filesystem;
 using libutil::FSUtil;
+using libutil::Permissions;
 
 SimpleExecutor::
 SimpleExecutor(std::shared_ptr<xcformatter::Formatter> const &formatter, bool dryRun, builtin::Registry const &builtins) :
@@ -199,8 +200,15 @@ writeAuxiliaryFiles(
                 xcformatter::Formatter::Print(_formatter->setAuxiliaryExecutable(auxiliaryFile.path()));
 
                 if (!_dryRun) {
-                    // FIXME: This should use the filesystem.
-                    if (::chmod(auxiliaryFile.path().c_str(), S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) != 0) {
+                    Permissions permissions;
+                    permissions.user(Permissions::Permission::Read, true);
+                    permissions.user(Permissions::Permission::Write, true);
+                    permissions.user(Permissions::Permission::Execute, true);
+                    permissions.group(Permissions::Permission::Read, true);
+                    permissions.group(Permissions::Permission::Execute, true);
+                    permissions.other(Permissions::Permission::Read, true);
+                    permissions.other(Permissions::Permission::Execute, true);
+                    if (!filesystem->writeFilePermissions(auxiliaryFile.path(), Permissions::Operation::Set, permissions)) {
                         return false;
                     }
                 }

@@ -90,5 +90,6 @@ target_link_libraries(builtin-embeddedBinaryValidationUtility builtin)
 install(TARGETS builtin-embeddedBinaryValidationUtility DESTINATION usr/bin)
 
 if (BUILD_TESTING)
+  ADD_UNIT_GTEST(builtin copy Tests/test_copy.cpp)
   ADD_UNIT_GTEST(builtin copyStrings Tests/test_copyStrings.cpp)
 endif ()
