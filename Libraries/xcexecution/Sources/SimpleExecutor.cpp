@@ -161,7 +161,7 @@ writeAuxiliaryFiles(
                 xcformatter::Formatter::Print(_formatter->createAuxiliaryDirectory(directory));
 
                 if (!_dryRun) {
-                    if (!filesystem->createDirectory(directory)) {
+                    if (!filesystem->createDirectory(directory, true)) {
                         return false;
                     }
                 }
@@ -239,7 +239,7 @@ performInvocations(
             for (std::string const &output : invocation.outputs()) {
                 std::string directory = FSUtil::GetDirectoryName(output);
 
-                if (!filesystem->createDirectory(directory)) {
+                if (!filesystem->createDirectory(directory, true)) {
                     return std::make_pair(false, std::vector<pbxbuild::Tool::Invocation>({ invocation }));
                 }
             }
