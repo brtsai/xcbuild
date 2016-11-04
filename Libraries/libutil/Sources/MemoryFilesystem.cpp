@@ -15,6 +15,7 @@
 #include <cassert>
 
 using libutil::MemoryFilesystem;
+using libutil::Permissions;
 using libutil::FSUtil;
 
 MemoryFilesystem::Entry::
@@ -156,6 +157,66 @@ bool MemoryFilesystem::
 isExecutable(std::string const &path) const
 {
     return this->exists(path);
+}
+
+static Permissions
+AllPermissions()
+{
+    Permissions permissions;
+    permissions.user(Permissions::Permission::Read, true);
+    permissions.user(Permissions::Permission::Write, true);
+    permissions.user(Permissions::Permission::Execute, true);
+    permissions.group(Permissions::Permission::Read, true);
+    permissions.group(Permissions::Permission::Write, true);
+    permissions.group(Permissions::Permission::Execute, true);
+    permissions.other(Permissions::Permission::Read, true);
+    permissions.other(Permissions::Permission::Write, true);
+    permissions.other(Permissions::Permission::Execute, true);
+    return permissions;
+}
+
+ext::optional<Permissions> MemoryFilesystem::
+readFilePermissions(std::string const &path) const
+{
+    if (!this->isFile(path)) {
+        return ext::nullopt;
+    }
+
+    return AllPermissions();
+}
+
+ext::optional<Permissions> MemoryFilesystem::
+readSymbolicLinkPermissions(std::string const &path) const
+{
+    return ext::nullopt;
+}
+
+ext::optional<Permissions> MemoryFilesystem::
+readDirectoryPermissions(std::string const &path) const
+{
+    if (!this->isDirectory(path)) {
+        return ext::nullopt;
+    }
+
+    return AllPermissions();
+}
+
+bool MemoryFilesystem::
+writeFilePermissions(std::string const &path, Permissions::Operation operation, Permissions permissions)
+{
+    return this->isFile(path);
+}
+
+bool MemoryFilesystem::
+writeSymbolicLinkPermissions(std::string const &path, Permissions::Operation operation, Permissions permissions)
+{
+    return false;
+}
+
+bool MemoryFilesystem::
+writeDirectoryPermissions(std::string const &path, Permissions::Operation operation, Permissions permissions, bool recursive)
+{
+    return this->isDirectory(path);
 }
 
 bool MemoryFilesystem::

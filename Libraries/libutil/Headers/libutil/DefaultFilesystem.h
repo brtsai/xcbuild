@@ -24,6 +24,14 @@ public:
     virtual bool isExecutable(std::string const &path) const;
 
 public:
+    virtual ext::optional<Permissions> readFilePermissions(std::string const &path) const;
+    virtual bool writeFilePermissions(std::string const &path, Permissions::Operation operation, Permissions permissions);
+    virtual ext::optional<Permissions> readSymbolicLinkPermissions(std::string const &path) const;
+    virtual bool writeSymbolicLinkPermissions(std::string const &path, Permissions::Operation operation, Permissions permissions);
+    virtual ext::optional<Permissions> readDirectoryPermissions(std::string const &path) const;
+    virtual bool writeDirectoryPermissions(std::string const &path, Permissions::Operation operation, Permissions permissions, bool recursive);
+
+public:
     virtual bool isFile(std::string const &path) const;
     virtual bool createFile(std::string const &path);
     virtual bool read(std::vector<uint8_t> *contents, std::string const &path, size_t offset = 0, ext::optional<size_t> length = ext::nullopt) const;
