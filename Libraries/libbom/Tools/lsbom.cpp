@@ -296,6 +296,68 @@ extern "C" {
     } __attribute__((packed));
 }
 
+/**
+ *  Todo:
+ *      Group Name
+ *      PermissionsText
+ *      FileSizeFormatted
+ *      ModificationTimeFormatted
+ *      Username
+ *      UserGroupName
+*/
+std::string
+printItemToString(Options::PrintItem item, std::string path, struct bom_path_info_2 *info){
+
+    switch (item) {
+        case Options::PrintItem::Checksum:
+            if (info->type == bom_path_type_directory) {
+                return "";
+            }
+            return std::to_string(ntohl(info->checksum));
+        case Options::PrintItem::FileName:
+            return path;
+        case Options::PrintItem::FileNameQuoted:
+            return "\"" + path + "\"";
+        case Options::PrintItem::GroupID:
+            return std::to_string(ntohl(info->group));
+        case Options::PrintItem::GroupName:
+
+        break;
+        case Options::PrintItem::Permissions: {
+            std::stringstream stream;
+            stream << std::oct << ntohs(info->mode);
+            return stream.str();
+        }
+        case Options::PrintItem::PermissionsText:
+
+        break;
+        case Options::PrintItem::FileSize:
+            return std::to_string(ntohl(info->size));
+        case Options::PrintItem::FileSizeFormatted:
+
+        break;
+        case Options::PrintItem::ModificationTime:
+            return std::to_string(ntohl(info->modtime));
+        break;
+        case Options::PrintItem::ModificationTimeFormatted:
+
+        break;
+        case Options::PrintItem::UserID:
+            return std::to_string(ntohl(info->user));
+        case Options::PrintItem::UserName:
+
+        break;
+        case Options::PrintItem::UserGroupID:
+            return std::to_string(ntohl(info->user)) + "/" + std::to_string(ntohl(info->group));
+        break;
+        case Options::PrintItem::UserGroupName:
+
+        break;
+    }
+
+    return "";
+}
+
 int
 main(int argc, char **argv)
 {
@@ -453,6 +515,18 @@ main(int argc, char **argv)
          */
         if (options->onlyPath()) {
             printf("%s\n", path.c_str());
+        } else if (options->printFormat()) {
+            
+            bool first = true;
+            std::string toPrint;
+
+            for (Options::PrintItem item : *options->printFormat()) {
+                toPrint += first? "" : "\t";
+                toPrint += printItemToString(item, path, path_info_2_value);
+                first = false;
+            }
+
+            printf("%s\n", toPrint.c_str());
         } else {
             // TODO: Respect options about what to print.
             std::stringstream stream;
